@@ -88,10 +88,10 @@ public class MainActivity extends AppCompatActivity
 
         public MessageViewHolder(View v) {
             super(v);
-            messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
-            messageImageView = (ImageView) itemView.findViewById(R.id.messageImageView);
-            messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
-            messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+            messageTextView = itemView.findViewById(R.id.messageTextView);
+            messageImageView = itemView.findViewById(R.id.messageImageView);
+            messengerTextView = itemView.findViewById(R.id.messengerTextView);
+            messengerImageView = itemView.findViewById(R.id.messengerImageView);
         }
     }
 
@@ -127,29 +127,42 @@ public class MainActivity extends AppCompatActivity
         mUsername = ANONYMOUS;
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
 
         // Initialize ProgressBar and RecyclerView.
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
+        mProgressBar = findViewById(R.id.progressBar);
+        mMessageRecyclerView = findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
+        // To fill RecyclerView content starting from the bottom of the view.
         mLinearLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
-        mMessageEditText = (EditText) findViewById(R.id.messageEditText);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mSharedPreferences
-                .getInt(CodelabPreferences.FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))});
+        mMessageEditText = findViewById(R.id.messageEditText);
+        mMessageEditText.setFilters(
+                new InputFilter[]{
+                        new InputFilter.LengthFilter(
+                                mSharedPreferences
+                                        .getInt(CodelabPreferences.FRIENDLY_MSG_LENGTH,
+                                                DEFAULT_MSG_LENGTH_LIMIT))}
+        );
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
 
+            /**
+             * This method is called to notify you that, within charSequence,
+             * the count characters beginning at start
+             * have just replaced old text that had length before.
+             * It is an error to attempt to make changes to charSequence from this callback.
+             */
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // TODO: pay attention to it!
                 if (charSequence.toString().trim().length() > 0) {
                     mSendButton.setEnabled(true);
                 } else {
@@ -162,7 +175,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mSendButton = (Button) findViewById(R.id.sendButton);
+        mSendButton = findViewById(R.id.sendButton);
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,7 +183,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mAddMessageImageView = (ImageView) findViewById(R.id.addMessageImageView);
+        mAddMessageImageView = findViewById(R.id.addMessageImageView);
         mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
